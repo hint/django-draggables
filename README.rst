@@ -20,7 +20,8 @@ Please note that django-draggables requires:
 Documentation
 =============
 
-RTFD link if existent
+Documentation is hosted with Read the Docs:
+http://django-draggables.readthedocs.org/
 
 Bugs & Contribution
 ===================
