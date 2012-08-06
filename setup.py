@@ -32,7 +32,6 @@ setup(
     classifiers=CLASSIFIERS,
     install_requires=[
         'Django>=1.2',
-        'django-admin-jqueryui>=1.8.11',
     ],
     tests_require=[
     ],

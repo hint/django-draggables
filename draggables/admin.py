@@ -49,7 +49,7 @@ class DraggableAdmin(ModelAdmin):
         Add jquery.draggables.js to any admin view
         '''
         media = super(DraggableAdmin, self)._media()
-        media.add_js(('admin_jqueryui/js/admin_jqueryui.min.js',
+        media.add_js(('draggables/admin_jqueryui.min.js',
                       'draggables/jquery.draggables.js',))
         # custom Admin instances can have, for instance, no changelist view
         try:
