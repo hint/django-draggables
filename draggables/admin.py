@@ -2,7 +2,7 @@ from django.conf import settings
 from django.conf.urls.defaults import patterns
 from django.contrib.admin import ModelAdmin
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import NoReverseMatch, reverse
 from django.http import HttpResponse, HttpResponseBadRequest
 
 from fields import DraggableAutoField
@@ -21,10 +21,14 @@ class DraggableAdmin(ModelAdmin):
         super(DraggableAdmin, self).__init__(model, admin_site)
         if DraggableAdmin.get_draggable_auto_field(self):
             self.ordering = [DraggableAdmin.get_draggable_auto_field(self).name,]
-        for inline in self.inline_instances:
-            if DraggableAdmin.get_draggable_auto_field(inline):
-                inline.opts.ordering = [DraggableAdmin.get_draggable_auto_field(inline).name]
-                DraggableAdmin.get_draggable_auto_field(inline).editable = True
+        try:
+            for inline in self.inline_instances:
+                if DraggableAdmin.get_draggable_auto_field(inline):
+                    inline.opts.ordering = [DraggableAdmin.get_draggable_auto_field(inline).name]
+                    DraggableAdmin.get_draggable_auto_field(inline).editable = True
+        # custom Admin instance can have no inline_instances attribute
+        except AttributeError:
+            pass
 
     @staticmethod
     def get_draggable_auto_field(klass):
@@ -45,13 +49,16 @@ class DraggableAdmin(ModelAdmin):
         Add jquery.draggables.js to any admin view
         '''
         media = super(DraggableAdmin, self)._media()
-        i18n_javascript = reverse('admin:%s_%s_changelist' % (
-            self.opts.app_label, self.opts.module_name,
-        ))
-        if DraggableAdmin.get_draggable_auto_field(self):
-            media.add_js(('admin_jqueryui/js/admin_jqueryui.min.js',
-                          '%sjsi18n/' % i18n_javascript,
-                          'draggables/jquery.draggables.js',))
+        media.add_js(('admin_jqueryui/js/admin_jqueryui.min.js',
+                      'draggables/jquery.draggables.js',))
+        # custom Admin instances can have, for instance, no changelist view
+        try:
+            i18n_javascript = reverse('admin:%s_%s_changelist' % (
+                self.opts.app_label, self.opts.module_name,
+            ))
+            media.add_js(('%sjsi18n/' % i18n_javascript,))
+        except NoReverseMatch:
+            pass
         return media
     media = property(_media)
 
