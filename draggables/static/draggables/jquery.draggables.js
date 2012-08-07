@@ -103,6 +103,10 @@
                 // tabular inline
                 if ($('.change-form .tabular').length > 0) {
                     wrapper = $('.change-form .tabular tbody');
+                // otherwise considered stacked, since stacked has no
+                // specific class in django admin
+                } else {
+                    wrapper = $('.inline-group');
                 }
             }
             return wrapper;
