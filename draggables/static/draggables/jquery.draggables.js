@@ -1,25 +1,29 @@
-// body-class .change-list
-// body-class .change-form
+/*jslint unparam: true, todo: true, browser: true */
 
 (function ($) {
+    "use strict";
 
-    var exceptions = {
+    var exceptions,
+        methods,
+        settings;
+
+    exceptions = {
         UnsupportedMode: 1,
         NotImplemented: 2
     };
 
-    var settings = {};
+    settings = {};
 
-    var methods = {
+    methods = {
         idListToSelector: function (ids) {
             return '#' + ids.join(', #');
         },
 
         changedCallbackChangeform: function (event, ui) {
-            var elements;
+            var elements, e;
             elements = $(methods.idListToSelector($(this).sortable('toArray')));
-            for (var e = 0; e < elements.length; e++) {
-                $('input.draggableAutoField', elements[e]).val(e+1);
+            for (e = 0; e < elements.length; e = e + 1) {
+                $('input.draggableAutoField', elements[e]).val(e + 1);
                 //console.log($('input.draggableAutoField', elements[e]), e+1);
             }
         },
@@ -39,10 +43,10 @@
         },
 
         getChangedCallback: function (mode) {
-            if (mode == 'change-list') {
+            if (mode === 'change-list') {
                 return methods.changedCallbackChangelist;
             }
-            if (mode == 'change-form') {
+            if (mode === 'change-form') {
                 return methods.changedCallbackChangeform;
             }
         },
@@ -51,33 +55,34 @@
          * This function should return string CSS selector
          * in order for serialization methods to work.
          *
+         * TODO: wrapper can be an array, support that!
+         *
          * @param wrapper
          * @param mode
-         * @todo wrapper can be an array, support that!
-         * 
+         *
          */
         getSortables: function (wrapper, mode) {
-            var ids, unfiltered;
-            if (mode == 'change-form') {
+            var ids, unfiltered, u;
+            if (mode === 'change-form') {
                 unfiltered = $('tr, div.inline-related', wrapper);
                 ids = [];
-                for (var u = 0; u < unfiltered.length; u++) {
-                    if($('.delete input', unfiltered[u]).length > 0) {
+                for (u = 0; u < unfiltered.length; u = u + 1) {
+                    if ($('.delete input', unfiltered[u]).length > 0) {
                         ids.push($(unfiltered[u]).attr('id'));
                     }
                 }
                 return methods.idListToSelector(ids);
             }
-            if (mode == 'change-list') {
+            if (mode === 'change-list') {
                 return 'tr';
             }
         },
 
         changeListAppendIds: function (wrapper) {
-            var rows, id;
+            var rows, id, r;
             rows = $(methods.getSortables(wrapper, 'change-list'));
-            for (var r = 0; r < rows.length; r++) {
-                id = parseInt($('a:first', rows[r]).attr('href'));
+            for (r = 0; r < rows.length; r = r + 1) {
+                id = parseInt($('a:first', rows[r]).attr('href'), 10);
                 $(rows[r]).attr('id', 'order_' + id); // might not be standard - compliant
             }
         },
@@ -96,10 +101,10 @@
 
         getSortablesWrapper: function (mode) {
             var wrapper;
-            if (mode == 'change-list') {
+            if (mode === 'change-list') {
                 wrapper = $('#result_list tbody');
             }
-            if (mode == 'change-form') {
+            if (mode === 'change-form') {
                 // tabular inline
                 if ($('.change-form .tabular').length > 0) {
                     wrapper = $('.change-form .tabular tbody');
@@ -127,7 +132,7 @@
             });
             $(items).css('cursor', 'move');
 
-            if (mode == 'change-list') {
+            if (mode === 'change-list') {
                 methods.changeListAppendIds(wrapper);
             }
         },
@@ -150,17 +155,20 @@
     };
 
     $.fn.Draggables = function (method) {
+        var m;
         if (methods[method]) {
-            return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
+            m = methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
         } else if (typeof method === 'object' || !method) {
-            return methods.init.apply(this, arguments);
+            m = methods.init.apply(this, arguments);
         } else {
             $.error('Method ' + method + ' does not exist on django.jQuery.Draggables');
         }
+        return m;
     };
 
 }(django.jQuery));
 
 django.jQuery(function () {
+    "use strict";
     django.jQuery('body').Draggables();
 });
