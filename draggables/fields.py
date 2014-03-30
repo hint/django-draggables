@@ -19,10 +19,13 @@ class DraggableAutoField(PositiveSmallIntegerField):
     def formfield(self, **kwargs):
         formfield = super(DraggableAutoField, self).formfield(**kwargs)
         #formfield.widget = HiddenInput(attrs={'class': 'draggableAutoField'})
-        formfield.widget.attrs['class'] += ' draggableAutoField'
+        # import ipdb; ipdb.set_trace()
+        try:
+            formfield.widget.attrs['class'] += ' draggableAutoField'
+        except KeyError:
+            formfield.widget.attrs['class'] = 'draggableAutoField'
         formfield.widget.attrs['readonly'] = 'readonly'
         return formfield
-
 
 
 try:
